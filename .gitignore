@@ -1,0 +1,15 @@
+.DS_Store
+.idea
+
+# ec2 local TF files
+Terraform/prod/ec2/.terraform/
+Terraform/staging/ec2/.terraform/
+
+# VPC local TF files
+Terraform/enviroment/staging/vpc/.terraform/
+Terraform/enviroment/prod/vpc/.terraform/
+
+# RDS local TF files
+Terraform/enviroment/staging/rds/.terraform/
+Terraform/enviroment/prod/rds/.terraform/
+

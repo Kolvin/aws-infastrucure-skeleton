@@ -1,0 +1,45 @@
+  {
+    "variables": {
+      "ami_id": "ami-f90a4880",
+      "app_name": "app-ami"
+    },
+
+    "builders": [{
+      "type": "amazon-ebs",
+      "region": "eu-west-1",
+      "profile": "default",
+      "ssh_username": "ubuntu",
+      "source_ami": "{{user `ami_id`}}",
+      "instance_type": "t2.micro",
+      "vpc_id": "vpc-123123", // add your own here
+      "subnet_id": "subnet-43a25719",
+      "ami_name": "Amazon Ubuntu Enhanced / App Customised (built on {{isotime \"20060102150405\"}})",
+      "tags": {
+          "Name": "AWS-Ubuntu-{{user `app_name` }}",
+          "Env": "Production",
+          "Product": "AMI"
+        }
+    }],
+
+  "provisioners": [{
+    "type": "shell",
+    "inline": [
+      "sleep 30",
+      "sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php",
+      "sudo apt-get clean",
+      "sudo apt-get update -y",
+
+      "sudo apt-get install -y apt-transport-https ca-certificates nfs-common",
+      "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
+      "sudo add-apt-repository \"deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable\"",
+      "sudo apt-get update",
+      "sudo apt-get install -y docker-ce",
+      "sudo usermod -aG docker ubuntu",
+      "sudo curl -L \"https://github.com/docker/compose/releases/download/1.10.0/docker-compose-$(uname -s)-$(uname -m)\" -o /usr/local/bin/docker-compose",
+      "sudo chmod +x /usr/local/bin/docker-compose",
+
+      "sudo apt-get remove apache2 -y",
+      "sudo docker run --volume=/:/rootfs:ro --volume=/var/run:/var/run:rw --volume=/sys:/sys:ro --volume=/cgroup:/sys/fs/cgroup:ro --volume=/var/lib/docker/:/var/lib/docker:ro --volume=/dev/disk/:/dev/disk:ro --publish=8080:8080 --detach=true --restart=always --name=cadvisor google/cadvisor:latest"
+    ]
+  }]
+  }
